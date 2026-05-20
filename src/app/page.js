@@ -1,65 +1,119 @@
-import Image from "next/image";
+import Link from "next/link";
+import CarCard from "@/components/CarCard";
 
-export default function Home() {
+// Helper to fetch cars
+async function getCars() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/cars`, {
+      cache: "no-store", // We can use revalidate for production, but no-store ensures fresh data during dev
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (error) {
+    console.error("Failed to fetch cars:", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const cars = await getCars();
+  // Ensure we only show available cars or all cars based on requirements? 
+  // "Available Cars Section... using database data. Show a minimum 6 cards."
+  const displayCars = cars.slice(0, 6);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
+    <div className="flex flex-col min-h-screen">
+      
+      {/* Banner Section */}
+      <section className="relative w-full h-[600px] flex items-center justify-center bg-gray-900 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1502877338535-766e1452684a')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+        <div className="relative z-10 text-center px-4 max-w-3xl">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 drop-shadow-lg leading-tight">
+            Drive Your <span className="text-primary">Dreams</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg md:text-2xl text-gray-200 mb-10 drop-shadow-md">
+            Experience premium mobility with our vast selection of luxury, sports, and family vehicles. Your journey begins here.
           </p>
+          <Link href="/cars" className="btn btn-primary btn-lg rounded-full shadow-xl hover:scale-105 transition-transform">
+            Explore Cars
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Why Choose Us (Extra Static Section 1) */}
+      <section className="py-20 bg-base-100">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-12">Why Choose Apex Rent?</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-8 bg-base-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">🏷️</div>
+              <h3 className="text-xl font-bold mb-4">Best Price Guarantee</h3>
+              <p className="text-gray-600">We offer competitive pricing with no hidden fees. What you see is what you pay.</p>
+            </div>
+            <div className="p-8 bg-base-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">🛡️</div>
+              <h3 className="text-xl font-bold mb-4">Premium Insurance</h3>
+              <p className="text-gray-600">Drive with peace of mind knowing you are fully covered by our comprehensive insurance.</p>
+            </div>
+            <div className="p-8 bg-base-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow">
+              <div className="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">⏱️</div>
+              <h3 className="text-xl font-bold mb-4">24/7 Support</h3>
+              <p className="text-gray-600">Our dedicated support team is available around the clock to assist you with any inquiries.</p>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* Available Cars Section */}
+      <section className="py-20 bg-base-200">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Available Cars</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Browse our collection of premium vehicles ready for your next adventure.</p>
+          </div>
+          
+          {displayCars.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {displayCars.map(car => (
+                <CarCard key={car._id} car={car} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 text-gray-500 bg-base-100 rounded-3xl shadow-inner">
+              <p className="text-xl">No cars currently available. Please check back later!</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* How It Works (Extra Static Section 2) */}
+      <section className="py-20 bg-base-100">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-16">How It Works</h2>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-12 relative">
+            <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent -z-10 -translate-y-1/2"></div>
+            
+            <div className="relative z-10 flex flex-col items-center max-w-xs bg-base-100 p-6 rounded-3xl shadow-lg border border-base-200">
+              <div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-md shadow-primary/40">1</div>
+              <h3 className="text-xl font-bold mb-3">Choose A Car</h3>
+              <p className="text-gray-500 text-sm">Browse our wide selection and find the perfect vehicle for your needs.</p>
+            </div>
+            
+            <div className="relative z-10 flex flex-col items-center max-w-xs bg-base-100 p-6 rounded-3xl shadow-lg border border-base-200">
+              <div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-md shadow-primary/40">2</div>
+              <h3 className="text-xl font-bold mb-3">Make A Booking</h3>
+              <p className="text-gray-500 text-sm">Select your dates, add any special requirements, and confirm your booking securely.</p>
+            </div>
+            
+            <div className="relative z-10 flex flex-col items-center max-w-xs bg-base-100 p-6 rounded-3xl shadow-lg border border-base-200">
+              <div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mb-6 shadow-md shadow-primary/40">3</div>
+              <h3 className="text-xl font-bold mb-3">Enjoy The Ride</h3>
+              <p className="text-gray-500 text-sm">Pick up your keys and enjoy a seamless driving experience.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }
