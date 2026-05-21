@@ -9,7 +9,6 @@ export default function Footer() {
         <h6 className="footer-title">Useful Links</h6>
         <Link href="/" className="link link-hover">Home</Link>
         <Link href="/cars" className="link link-hover">Explore Cars</Link>
-        <Link href="/login" className="link link-hover">Login</Link>
       </nav>
       <nav>
         <h6 className="footer-title">Contact Info</h6>
