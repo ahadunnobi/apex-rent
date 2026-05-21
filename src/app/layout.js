@@ -1,25 +1,37 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata = {
-  title: "Apex Rent - Car Rental Platform",
-  description: "Explore, book, and list cars for rent.",
+  title: "Apex Rent — Premium Car Rentals",
+  description:
+    "Experience the future of car rentals. Browse, book, and manage premium vehicles with Apex Rent.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme="light">
+    <html lang="en" data-theme="apex">
       <head>
-        {/* The user wants the logo as favicon, they can replace favicon.ico in public */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
+      <body className="min-h-screen flex flex-col bg-grid">
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
 }
+

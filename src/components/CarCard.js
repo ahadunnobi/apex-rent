@@ -1,45 +1,84 @@
-import Link from "next/link";
-import Image from "next/image";
+"use client";
 
-export default function CarCard({ car, showActions, onDelete }) {
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { FaGasPump, FaUsers, FaCog } from "react-icons/fa";
+import { MdSpeed } from "react-icons/md";
+
+export default function CarCard({ car, index = 0 }) {
   return (
-    <div className="card bg-base-100 shadow-xl overflow-hidden group">
-      <figure className="relative h-56 w-full">
-        {/* We use standard img to avoid Next Image strict domain constraints for now */}
-        <img 
-          src={car.image || "https://images.unsplash.com/photo-1542282088-fe8426682b8f"} 
-          alt={car.name} 
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      whileHover={{ y: -8 }}
+      className="glass-card overflow-hidden group cursor-pointer"
+    >
+      {/* Image */}
+      <div className="relative h-52 w-full overflow-hidden">
+        <img
+          src={car.image || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=600"}
+          alt={car.name || "Car"}
+          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute top-4 right-4 bg-primary text-primary-content px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+        {/* Price badge */}
+        <div className="absolute top-4 right-4 bg-gradient-to-r from-primary to-secondary text-primary-content px-3 py-1 rounded-full text-sm font-bold shadow-lg">
           ${car.price}/day
         </div>
+        {/* Availability overlay */}
         {car.availability === "Unavailable" && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="text-white text-2xl font-bold rotate-[-15deg]">UNAVAILABLE</span>
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center backdrop-blur-sm">
+            <span className="text-red-400 text-xl font-bold font-display tracking-widest rotate-[-10deg] border-2 border-red-400/50 px-4 py-2 rounded">
+              UNAVAILABLE
+            </span>
           </div>
         )}
-      </figure>
-      <div className="card-body">
-        <h2 className="card-title text-2xl">{car.name}</h2>
-        <div className="flex justify-between items-center text-sm text-gray-500 mt-2">
-          <span>Type: <span className="font-semibold text-gray-700">{car.type}</span></span>
-          <span>Seats: <span className="font-semibold text-gray-700">{car.seatCapacity}</span></span>
-        </div>
-        <p className="mt-3 text-gray-600 line-clamp-2">{car.description}</p>
-        
-        <div className="card-actions justify-end mt-4">
-          {showActions ? (
-             <div className="flex gap-2">
-               <Link href={`/update-car/${car._id}`} className="btn btn-sm btn-outline btn-info">Update</Link>
-               <button onClick={() => onDelete(car._id)} className="btn btn-sm btn-outline btn-error">Delete</button>
-               <Link href={`/cars/${car._id}`} className="btn btn-sm btn-primary">Details</Link>
-             </div>
-          ) : (
-            <Link href={`/cars/${car._id}`} className="btn btn-primary w-full">View Details</Link>
+        {/* Bottom gradient overlay */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-base-100/80 to-transparent" />
+      </div>
+
+      {/* Content */}
+      <div className="p-5">
+        <h3 className="text-lg font-bold font-display text-base-content mb-2 tracking-wide">
+          {car.name}
+        </h3>
+
+        {/* Specs row */}
+        <div className="flex items-center gap-4 text-xs text-base-content/60 mb-3">
+          {car.type && (
+            <span className="flex items-center gap-1">
+              <FaCog className="text-primary" />
+              {car.type}
+            </span>
+          )}
+          {car.seatCapacity && (
+            <span className="flex items-center gap-1">
+              <FaUsers className="text-primary" />
+              {car.seatCapacity} seats
+            </span>
+          )}
+          {car.fuelType && (
+            <span className="flex items-center gap-1">
+              <FaGasPump className="text-primary" />
+              {car.fuelType}
+            </span>
           )}
         </div>
+
+        {/* Description */}
+        <p className="text-base-content/70 text-sm line-clamp-2 mb-4 leading-relaxed">
+          {car.description || "Experience the thrill of driving this premium vehicle."}
+        </p>
+
+
+        {/* Action */}
+        <Link
+          href={`/cars/${car._id}`}
+          className="btn-neon w-full py-2.5 rounded-lg text-center text-sm block"
+        >
+          View Details
+        </Link>
       </div>
-    </div>
+    </motion.div>
   );
 }

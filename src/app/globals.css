@@ -1,11 +1,254 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* ── DaisyUI futuristic dark theme ── */
+@plugin "daisyui/theme" {
+  name: "apex";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: oklch(0.15 0.02 260);
+  --color-base-200: oklch(0.12 0.025 260);
+  --color-base-300: oklch(0.10 0.03 260);
+  --color-base-content: oklch(0.92 0.01 260);
+  --color-primary: oklch(0.78 0.18 195);
+  --color-primary-content: oklch(0.15 0.02 260);
+  --color-secondary: oklch(0.55 0.25 295);
+  --color-secondary-content: oklch(0.95 0.01 295);
+  --color-accent: oklch(0.70 0.20 150);
+  --color-accent-content: oklch(0.15 0.02 150);
+  --color-neutral: oklch(0.20 0.02 260);
+  --color-neutral-content: oklch(0.85 0.01 260);
+  --color-info: oklch(0.72 0.15 230);
+  --color-success: oklch(0.72 0.19 155);
+  --color-warning: oklch(0.80 0.18 85);
+  --color-error: oklch(0.65 0.22 25);
+  --rounded-box: 1rem;
+  --rounded-btn: 0.75rem;
+}
+
+/* ── DaisyUI futuristic light theme ── */
+@plugin "daisyui/theme" {
+  name: "apex-light";
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: oklch(0.98 0.01 260);
+  --color-base-200: oklch(0.95 0.015 260);
+  --color-base-300: oklch(0.90 0.02 260);
+  --color-base-content: oklch(0.15 0.02 260);
+  --color-primary: oklch(0.60 0.18 195);
+  --color-primary-content: oklch(0.98 0.01 260);
+  --color-secondary: oklch(0.50 0.25 295);
+  --color-secondary-content: oklch(0.98 0.01 295);
+  --color-accent: oklch(0.60 0.20 150);
+  --color-accent-content: oklch(0.98 0.01 150);
+  --color-neutral: oklch(0.90 0.02 260);
+  --color-neutral-content: oklch(0.15 0.01 260);
+  --color-info: oklch(0.60 0.15 230);
+  --color-success: oklch(0.60 0.19 155);
+  --color-warning: oklch(0.70 0.18 85);
+  --color-error: oklch(0.55 0.22 25);
+  --rounded-box: 1rem;
+  --rounded-btn: 0.75rem;
+}
+
 :root {
-  /* Use daisyUI themes */
+  --neon-cyan: #00f0ff;
+  --neon-purple: #7c3aed;
+  --neon-magenta: #e040fb;
+  --glass-bg: rgba(15, 15, 35, 0.6);
+  --glass-border: rgba(0, 240, 255, 0.15);
+}
+
+[data-theme="apex-light"] {
+  --neon-cyan: #0088cc;
+  --neon-purple: #6200ee;
+  --neon-magenta: #d500f9;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 136, 204, 0.25);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--color-base-100);
+  color: var(--color-base-content);
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+
+h1, h2, h3, .font-display {
+  font-family: 'Orbitron', 'Inter', sans-serif;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.1), 0 0 60px rgba(124, 58, 237, 0.05);
+  transform: translateY(-4px);
+}
+
+.btn-neon {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-neon:hover {
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.5), 0 0 50px rgba(124, 58, 237, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-neon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-neon:hover::before {
+  left: 100%;
+}
+
+.btn-neon-outline {
+  background: transparent;
+  color: var(--neon-cyan);
+  border: 1px solid var(--neon-cyan);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.3s ease;
+}
+
+.btn-neon-outline:hover {
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-glow {
+  position: relative;
+}
+
+.section-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070714;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+  border-radius: 4px;
+}
+
+.react-loading-skeleton {
+  --base-color: rgba(30, 30, 60, 0.8) !important;
+  --highlight-color: rgba(0, 240, 255, 0.08) !important;
+}
+
+.input-futuristic {
+  background: rgba(15, 15, 40, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: #e0e0f0;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.input-futuristic:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.input-futuristic::placeholder {
+  color: rgba(200, 200, 230, 0.4);
+}
+
+.textarea-futuristic {
+  background: rgba(15, 15, 40, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: #e0e0f0;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.textarea-futuristic:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.select-futuristic {
+  background: rgba(15, 15, 40, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: #e0e0f0;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  appearance: none;
+}
+
+.select-futuristic:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.page-wrapper {
+  min-height: calc(100vh - 80px);
+}
