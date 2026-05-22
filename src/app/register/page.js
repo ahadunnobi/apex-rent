@@ -4,40 +4,59 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { getGoogleAuthUrl } from "@/lib/api";
+
+function validatePassword(password) {
+  if (password.length < 6) return "Password must be at least 6 characters.";
+  if (!/[A-Z]/.test(password)) return "Password must contain an uppercase letter.";
+  if (!/[a-z]/.test(password)) return "Password must contain a lowercase letter.";
+  return "";
+}
 
 export default function RegisterPage() {
   const router = useRouter();
   const { register } = useAuth();
+  const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [photo, setPhoto] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handlePasswordChange = (value) => {
+    setPassword(value);
+    setPasswordError(validatePassword(value));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    if (!name || !email || !password) {
-      setError("Please fill in all fields.");
+    const pwErr = validatePassword(password);
+    if (pwErr) {
+      setPasswordError(pwErr);
       return;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (!name || !email || !password) {
+      setError("Please fill in all required fields.");
       return;
     }
 
     setLoading(true);
-    setTimeout(() => {
-      const res = register(name, email, password);
-      if (res.success) {
-        router.push("/");
-      } else {
-        setError("Failed to register account.");
-        setLoading(false);
-      }
-    }, 800);
+    try {
+      await register(name, email, photo, password);
+      toast.success("Account created! Please log in.");
+      router.push("/login");
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,13 +69,12 @@ export default function RegisterPage() {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
         className="card w-full max-w-md bg-base-100/60 backdrop-blur-md border border-primary/20 shadow-2xl p-8 z-10"
       >
         <div className="card-body p-0">
           <div className="text-center mb-8">
             <span className="text-xs uppercase tracking-[0.2em] font-bold text-primary mb-2 block">
-              Initialization
+              Join Apex Rent
             </span>
             <h2 className="text-3xl font-black font-display text-base-content">
               Create <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Account</span>
@@ -64,22 +82,20 @@ export default function RegisterPage() {
           </div>
 
           {error && (
-            <div className="alert alert-error mb-6 py-3 rounded-lg text-sm border border-error/20 bg-error/10 text-error-content flex items-center">
+            <div className="alert alert-error mb-6 py-3 rounded-lg text-sm border border-error/20 bg-error/10">
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="form-control">
               <label className="label py-1">
-                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">
-                  Driver Name
-                </span>
+                <span className="label-text text-xs uppercase tracking-wider font-semibold text-base-content/60">Name</span>
               </label>
               <input
                 type="text"
-                placeholder="Alex Mercer"
-                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary focus:outline-none rounded-xl"
+                placeholder="Your full name"
+                className="input input-bordered w-full bg-base-200/50 border-primary/20 rounded-xl"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -88,14 +104,12 @@ export default function RegisterPage() {
 
             <div className="form-control">
               <label className="label py-1">
-                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">
-                  Email Address
-                </span>
+                <span className="label-text text-xs uppercase tracking-wider font-semibold text-base-content/60">Email</span>
               </label>
               <input
                 type="email"
                 placeholder="driver@apex.rent"
-                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary focus:outline-none rounded-xl"
+                className="input input-bordered w-full bg-base-200/50 border-primary/20 rounded-xl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -104,36 +118,59 @@ export default function RegisterPage() {
 
             <div className="form-control">
               <label className="label py-1">
-                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">
-                  Secure Password
-                </span>
+                <span className="label-text text-xs uppercase tracking-wider font-semibold text-base-content/60">Photo URL</span>
+              </label>
+              <input
+                type="url"
+                placeholder="https://example.com/photo.jpg"
+                className="input input-bordered w-full bg-base-200/50 border-primary/20 rounded-xl"
+                value={photo}
+                onChange={(e) => setPhoto(e.target.value)}
+              />
+            </div>
+
+            <div className="form-control">
+              <label className="label py-1">
+                <span className="label-text text-xs uppercase tracking-wider font-semibold text-base-content/60">Password</span>
               </label>
               <input
                 type="password"
                 placeholder="••••••••"
-                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary focus:outline-none rounded-xl"
+                className={`input input-bordered w-full bg-base-200/50 rounded-xl ${passwordError ? "border-error" : "border-primary/20"}`}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handlePasswordChange(e.target.value)}
                 required
               />
+              {passwordError && (
+                <p className="text-error text-xs mt-1">{passwordError}</p>
+              )}
+              <p className="text-xs text-base-content/40 mt-1">
+                Min 6 chars, one uppercase and one lowercase letter.
+              </p>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="btn btn-primary w-full rounded-xl text-sm font-bold uppercase tracking-widest mt-4 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] disabled:opacity-50"
+              disabled={loading || !!passwordError}
+              className="btn btn-primary w-full rounded-xl font-bold uppercase tracking-widest mt-2"
             >
-              {loading ? <span className="loading loading-spinner"></span> : "Initialize Session"}
+              {loading ? <span className="loading loading-spinner" /> : "Register"}
             </button>
           </form>
 
+          <div className="divider text-xs text-base-content/40 my-6">OR</div>
+
+          <a
+            href={getGoogleAuthUrl()}
+            className="btn btn-outline w-full rounded-xl gap-2 border-primary/30"
+          >
+            <FcGoogle className="text-xl" /> Continue with Google
+          </a>
+
           <p className="text-center text-sm text-base-content/60 mt-8">
-            Already registered?{" "}
-            <Link
-              href="/login"
-              className="text-primary font-bold hover:underline"
-            >
-              Authenticate Portal
+            Already have an account?{" "}
+            <Link href="/login" className="text-primary font-bold hover:underline">
+              Log in
             </Link>
           </p>
         </div>

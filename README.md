@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Apex Rent — Premium Car Rental Platform
 
-## Getting Started
+**Live Site:** [https://apex-rent.vercel.app](https://apex-rent.vercel.app) *(update with your deployed URL)*
 
-First, run the development server:
+A full-stack car rental platform where users can explore vehicles, book rides, manage listings, and authenticate securely with JWT cookies.
+
+## Features
+
+- Browse and search cars by name with MongoDB `$regex`, and filter by vehicle type
+- Secure JWT authentication stored in HTTP-only cookies — sessions persist on page reload
+- Google OAuth login for quick access
+- Add, update, and delete your own car listings with owner-protected APIs
+- Book cars with driver preference and special notes; booking count increments via `$inc`
+- Responsive futuristic UI with theme toggle, Framer Motion animations, and custom toast notifications
+- Custom 404 page and loading spinners across data-fetching views
+
+## Tech Stack
+
+| Layer   | Technologies                          |
+|---------|---------------------------------------|
+| Client  | Next.js, React, Tailwind CSS, DaisyUI |
+| Server  | Express, MongoDB, JWT, bcrypt         |
+| Deploy  | Vercel (client), Render (server)      |
+
+## Local Setup
+
+### Server (`apex-rent-server`)
+
+```bash
+cd apex-rent-server
+npm install
+```
+
+Create `.env`:
+
+```env
+MONGODB=your_mongodb_uri
+JWT_SECRET=your_secret_key
+CLIENT_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+PORT=5000
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Client (`apex-rent`)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+cd apex-rent
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local`:
 
-## Learn More
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Google OAuth Setup
 
-## Deploy on Vercel
+Add this redirect URI in Google Cloud Console:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+https://your-server.onrender.com/auth/google/callback
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Repositories
+
+- **Client:** [GitHub — apex-rent](https://github.com/your-username/apex-rent)
+- **Server:** [GitHub — apex-rent-server](https://github.com/your-username/apex-rent-server)
+
+## Author
+
+Built as an academic assignment — Apex Rent © 2026

@@ -1,41 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { getGoogleAuthUrl } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, user, mounted } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (mounted && user) router.replace("/");
+  }, [mounted, user, router]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.search.includes("error=google_failed")) {
+      toast.error("Google login failed. Please try again.");
+    }
+  }, [toast]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
     setLoading(true);
-    setTimeout(() => {
-      const res = login(email, password);
-      if (res.success) {
-        router.push("/");
-      } else {
-        setError("Failed to login.");
-        setLoading(false);
-      }
-    }, 800);
+    try {
+      await login(email, password);
+      toast.success("Welcome back to Apex Rent!");
+      router.push("/");
+    } catch (err) {
+      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,12 +67,12 @@ export default function LoginPage() {
               Welcome Back
             </span>
             <h2 className="text-3xl font-black font-display text-base-content">
-              Access the <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Portal</span>
+              Login to <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Apex Rent</span>
             </h2>
           </div>
 
           {error && (
-            <div className="alert alert-error mb-6 py-3 rounded-lg text-sm border border-error/20 bg-error/10 text-error-content flex items-center">
+            <div className="alert alert-error mb-6 py-3 rounded-lg text-sm border border-error/20 bg-error/10">
               <span>{error}</span>
             </div>
           )}
@@ -70,14 +80,12 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="form-control">
               <label className="label py-1">
-                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">
-                  Email Address
-                </span>
+                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">Email</span>
               </label>
               <input
                 type="email"
                 placeholder="driver@apex.rent"
-                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary focus:outline-none rounded-xl"
+                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary rounded-xl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -86,14 +94,12 @@ export default function LoginPage() {
 
             <div className="form-control">
               <label className="label py-1">
-                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">
-                  Password
-                </span>
+                <span className="label-text text-xs uppercase tracking-wider text-base-content/60 font-semibold">Password</span>
               </label>
               <input
                 type="password"
                 placeholder="••••••••"
-                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary focus:outline-none rounded-xl"
+                className="input input-bordered w-full bg-base-200/50 border-primary/20 focus:border-primary rounded-xl"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -103,19 +109,25 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary w-full rounded-xl text-sm font-bold uppercase tracking-widest mt-4 hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] disabled:opacity-50"
+              className="btn btn-primary w-full rounded-xl text-sm font-bold uppercase tracking-widest mt-2"
             >
-              {loading ? <span className="loading loading-spinner"></span> : "Sign In"}
+              {loading ? <span className="loading loading-spinner" /> : "Login"}
             </button>
           </form>
 
+          <div className="divider text-xs text-base-content/40 my-6">OR</div>
+
+          <a
+            href={getGoogleAuthUrl()}
+            className="btn btn-outline w-full rounded-xl gap-2 border-primary/30 hover:border-primary hover:bg-primary/5"
+          >
+            <FcGoogle className="text-xl" /> Continue with Google
+          </a>
+
           <p className="text-center text-sm text-base-content/60 mt-8">
             New to Apex Rent?{" "}
-            <Link
-              href="/register"
-              className="text-primary font-bold hover:underline"
-            >
-              Initialize Account
+            <Link href="/register" className="text-primary font-bold hover:underline">
+              Create an account
             </Link>
           </p>
         </div>

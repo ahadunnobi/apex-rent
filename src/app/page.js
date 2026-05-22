@@ -74,7 +74,7 @@ export default function Home() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link href="/cars" className="btn-neon px-8 py-3.5 rounded-xl text-sm font-bold">
-              Explore Fleet
+              Explore Cars
             </Link>
             <Link
               href="/add-car"
