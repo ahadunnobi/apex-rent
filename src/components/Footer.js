@@ -16,7 +16,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-cyan-400/30 group-hover:ring-cyan-400/70 transition-all">
                 <Image
-                  src="/favicon.ico"
+                  src="/logo.png"
                   alt="Apex Rent Logo"
                   width={40}
                   height={40}
@@ -42,6 +42,9 @@ export default function Footer() {
             </Link>
             <Link href="/cars" className="text-gray-400 hover:text-cyan-300 transition-colors text-sm">
               Explore Cars
+            </Link>
+            <Link href="/my-bookings" className="text-gray-400 hover:text-cyan-300 transition-colors text-sm">
+              My Bookings
             </Link>
             <Link href="/add-car" className="text-gray-400 hover:text-cyan-300 transition-colors text-sm">
               Add Car

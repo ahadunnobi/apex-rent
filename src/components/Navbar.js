@@ -58,7 +58,7 @@ export default function Navbar() {
           <div className="avatar ring ring-primary/30 ring-offset-base-100 ring-offset-2 rounded-full overflow-hidden transition-all duration-300 group-hover:ring-primary/80">
             <div className="w-9 h-9 relative">
               <Image
-                src="/favicon.ico"
+                src="/logo.png"
                 alt="Apex Rent Logo"
                 fill
                 sizes="36px"

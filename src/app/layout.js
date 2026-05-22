@@ -2,13 +2,14 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 export const metadata = {
   title: "Apex Rent — Premium Car Rentals",
   description:
     "Experience the future of car rentals. Browse, book, and manage premium vehicles with Apex Rent.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
   },
 };
 
@@ -26,9 +27,11 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-screen flex flex-col bg-grid">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          <ToastProvider>
+            <Navbar />
+            <main className="flex-grow">{children}</main>
+            <Footer />
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>
