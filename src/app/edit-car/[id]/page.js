@@ -39,12 +39,12 @@ function EditCarForm() {
       .then((res) => res.json())
       .then((data) => {
         setForm({
-          price: data.price ?? "",
+          price: data.daily_rent_price ?? data.price ?? "",
           description: data.description ?? "",
-          availability: data.availability ?? "Available",
-          image: data.image ?? "",
-          type: data.type ?? "",
-          location: data.pickupLocation || data.location || "",
+          availability: data.availability_status === false ? "Unavailable" : (data.availability ?? "Available"),
+          image: data.image_url ?? data.image ?? "",
+          type: data.car_type ?? data.type ?? "",
+          location: data.pickup_location || data.pickupLocation || data.location || "",
         });
         setLoading(false);
       })
@@ -62,7 +62,13 @@ function EditCarForm() {
       await apiFetch(`/cars/${params.id}`, {
         method: "PUT",
         body: JSON.stringify({
+          ...form,
           price: Number(form.price),
+          daily_rent_price: Number(form.price),
+          availability_status: form.availability === "Available",
+          car_type: form.type,
+          image_url: form.image,
+          pickup_location: form.location,
           description: form.description,
           availability: form.availability,
           image: form.image,

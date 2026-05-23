@@ -93,13 +93,17 @@ function MyCarsContent() {
                   className="card bg-base-100/50 border border-primary/10 shadow-xl overflow-hidden"
                 >
                   <figure className="relative h-48 overflow-hidden">
-                    <img src={car.image} alt={car.name} className="object-cover w-full h-full" />
+                    <img 
+                      src={car.image_url || car.image || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=600"} 
+                      alt={car.car_name || car.name} 
+                      className="object-cover w-full h-full" 
+                    />
                     <div className="absolute top-4 right-4 bg-gradient-to-r from-primary to-secondary text-primary-content px-3 py-1 rounded-full text-xs font-bold">
-                      ${car.price}/day
+                      ${car.daily_rent_price || car.price}/day
                     </div>
                   </figure>
                   <div className="card-body p-5">
-                    <h2 className="font-display font-black text-lg">{car.name}</h2>
+                    <h2 className="font-display font-black text-lg">{car.car_name || car.name}</h2>
                     <p className="text-xs text-base-content/60 flex items-center gap-1 mb-4">
                       <FaMapMarkerAlt className="text-primary" />
                       {car.pickupLocation || car.location || "N/A"}
@@ -109,7 +113,7 @@ function MyCarsContent() {
                         <FaEdit className="text-xs" /> Update
                       </Link>
                       <button
-                        onClick={() => setDeleteTarget({ id: car._id, name: car.name })}
+                        onClick={() => setDeleteTarget({ id: car._id, name: car.car_name || car.name })}
                         className="btn btn-outline btn-sm btn-error flex-1 gap-1"
                       >
                         <FaTrash className="text-xs" /> Delete

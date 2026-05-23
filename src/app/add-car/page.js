@@ -45,8 +45,15 @@ function AddCarForm() {
         body: JSON.stringify({
           ...form,
           price: Number(form.price),
+          daily_rent_price: Number(form.price),
           seatCapacity: Number(form.seatCapacity),
+          seat_capacity: Number(form.seatCapacity),
           location: form.pickupLocation,
+          pickup_location: form.pickupLocation,
+          availability_status: form.availability === "Available",
+          car_type: form.type,
+          image_url: form.image,
+          car_name: form.name
         }),
       });
       toast.success("Car listed successfully!");

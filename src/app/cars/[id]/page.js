@@ -129,30 +129,30 @@ export default function CarDetailPage() {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden">
           <div className="relative h-[400px] w-full overflow-hidden">
             <img
-              src={car.image || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=1200"}
-              alt={car.name}
+              src={car.image_url || car.image || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=1200"}
+              alt={car.car_name || car.name}
               className="object-cover w-full h-full"
             />
             <div className="absolute top-6 right-6 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-5 py-2 rounded-xl text-lg font-bold">
-              ${car.price}/day
+              ${car.daily_rent_price || car.price}/day
             </div>
             <div className={`absolute top-6 left-6 px-4 py-1.5 rounded-full text-xs font-bold uppercase
-              ${car.availability === "Available" ? "bg-green-500/20 text-green-300 border border-green-400/30" : "bg-red-500/20 text-red-300 border border-red-400/30"}`}>
-              {car.availability || "Available"}
+              ${car.availability_status !== false && car.availability !== "Unavailable" ? "bg-green-500/20 text-green-300 border border-green-400/30" : "bg-red-500/20 text-red-300 border border-red-400/30"}`}>
+              {(car.availability_status !== false && car.availability !== "Unavailable") ? "Available" : "Unavailable"}
             </div>
           </div>
 
           <div className="p-8">
-            <h1 className="text-3xl md:text-4xl font-black font-display mb-2">{car.name}</h1>
+            <h1 className="text-3xl md:text-4xl font-black font-display mb-2">{car.car_name || car.name}</h1>
             {car.booking_count > 0 && (
               <p className="text-sm text-primary mb-6">{car.booking_count} bookings so far</p>
             )}
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {[
-                { icon: <FaCog />, label: "Type", value: car.type },
-                { icon: <FaUsers />, label: "Seats", value: car.seatCapacity },
-                { icon: <FaMapMarkerAlt />, label: "Pickup", value: car.pickupLocation || car.location },
+                { icon: <FaCog />, label: "Type", value: car.car_type || car.type },
+                { icon: <FaUsers />, label: "Seats", value: car.seat_capacity || car.seatCapacity },
+                { icon: <FaMapMarkerAlt />, label: "Pickup", value: car.pickup_location || car.location },
                 { icon: <FaCog />, label: "Fuel", value: car.fuelType || "N/A" },
               ].map((spec, i) => (
                 <div key={i} className="glass-card !bg-white/[0.03] p-4 text-center">
@@ -168,7 +168,7 @@ export default function CarDetailPage() {
               <p className="text-base-content/70 leading-relaxed">{car.description || "No description available."}</p>
             </div>
 
-            {car.availability !== "Unavailable" && (
+            {(car.availability_status !== false && car.availability !== "Unavailable") && (
               <div className="mb-8">
                 {user ? (
                   <button
