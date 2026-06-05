@@ -8,8 +8,9 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { FaArrowLeft, FaSave } from "react-icons/fa";
 import PrivateRoute from "@/components/PrivateRoute";
+import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { apiFetch, API } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
 
 export default function EditCarPage() {
   return (
@@ -22,8 +23,10 @@ export default function EditCarPage() {
 function EditCarForm() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [forbidden, setForbidden] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     price: "",
@@ -35,9 +38,15 @@ function EditCarForm() {
   });
 
   useEffect(() => {
-    fetch(`${API}/cars/${params.id}`)
+    fetch(`/api/proxy/cars/${params.id}`)
       .then((res) => res.json())
       .then((data) => {
+        const owner = data.ownerEmail || data.addedBy;
+        if (user && owner && owner !== user.email) {
+          setForbidden(true);
+          setLoading(false);
+          return;
+        }
         setForm({
           price: data.daily_rent_price ?? data.price ?? "",
           description: data.description ?? "",
@@ -49,7 +58,7 @@ function EditCarForm() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [params.id]);
+  }, [params.id, user]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -89,6 +98,15 @@ function EditCarForm() {
     return (
       <div className="min-h-screen py-24 max-w-3xl mx-auto px-4">
         <Skeleton height={400} borderRadius={16} />
+      </div>
+    );
+  }
+
+  if (forbidden) {
+    return (
+      <div className="min-h-screen py-24 max-w-3xl mx-auto px-4 text-center">
+        <p className="text-error font-display text-xl mb-4">You can only edit your own listings.</p>
+        <Link href="/my-cars" className="btn btn-primary rounded-xl">Back to My Cars</Link>
       </div>
     );
   }

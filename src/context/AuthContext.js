@@ -1,7 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import { apiFetch } from "@/lib/api";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { authClient } from "@/lib/auth-client";
+import { normalizeUser } from "@/lib/car-utils";
 
 const AuthContext = createContext();
 
@@ -11,8 +18,8 @@ export function AuthProvider({ children }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const data = await apiFetch("/auth/me");
-      setUser(data);
+      const { data } = await authClient.getSession();
+      setUser(data?.user ? normalizeUser(data.user) : null);
     } catch {
       setUser(null);
     }
@@ -23,25 +30,33 @@ export function AuthProvider({ children }) {
   }, [refreshUser]);
 
   const login = async (email, password) => {
-    const data = await apiFetch("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
     });
-    setUser(data);
+    if (error) {
+      throw new Error(error.message || "Login failed");
+    }
+    setUser(normalizeUser(data.user));
     return { success: true };
   };
 
   const register = async (name, email, photo, password) => {
-    await apiFetch("/auth/register", {
-      method: "POST",
-      body: JSON.stringify({ name, email, photo, password }),
+    const { error } = await authClient.signUp.email({
+      email,
+      password,
+      name,
+      image: photo || undefined,
     });
+    if (error) {
+      throw new Error(error.message || "Registration failed");
+    }
     return { success: true };
   };
 
   const logout = async () => {
     try {
-      await apiFetch("/auth/logout", { method: "POST" });
+      await authClient.signOut();
     } catch {
       /* ignore */
     }

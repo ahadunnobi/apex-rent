@@ -7,11 +7,20 @@ import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { getGoogleAuthUrl } from "@/lib/api";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [redirectTo, setRedirectTo] = useState("/");
   const { login, user, mounted } = useAuth();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      if (redirect?.startsWith("/")) setRedirectTo(redirect);
+    }
+  }, []);
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,12 +48,23 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast.success("Welcome back to Apex Rent!");
-      router.push("/");
+      router.push(redirectTo.startsWith("/") ? redirectTo : "/");
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: redirectTo,
+      });
+    } catch {
+      toast.error("Google login failed");
     }
   };
 
@@ -67,7 +87,7 @@ export default function LoginPage() {
               Welcome Back
             </span>
             <h2 className="text-3xl font-black font-display text-base-content">
-              Login to <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Apex Rent</span>
+              User <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Login</span>
             </h2>
           </div>
 
@@ -117,12 +137,13 @@ export default function LoginPage() {
 
           <div className="divider text-xs text-base-content/40 my-6">OR</div>
 
-          <a
-            href={getGoogleAuthUrl()}
+          <button
+            onClick={handleGoogleLogin}
+            type="button"
             className="btn btn-outline w-full rounded-xl gap-2 border-primary/30 hover:border-primary hover:bg-primary/5"
           >
             <FcGoogle className="text-xl" /> Continue with Google
-          </a>
+          </button>
 
           <p className="text-center text-sm text-base-content/60 mt-8">
             New to Apex Rent?{" "}

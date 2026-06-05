@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 import { FaSearch } from "react-icons/fa";
 import CarCard from "@/components/CarCard";
 import CarSkeleton from "@/components/CarSkeleton";
-import { API } from "@/lib/api";
+import { fetchCars as fetchCarsApi } from "@/lib/fetchCars";
+
 
 const CAR_TYPES = ["", "Sedan", "SUV", "Sports", "Luxury", "Electric", "Hatchback", "Truck", "Van"];
 
@@ -15,26 +16,26 @@ export default function CarsPage() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
 
-  const fetchCars = useCallback(() => {
+  const loadCars = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams();
     if (search.trim()) params.set("search", search.trim());
     if (typeFilter) params.set("type", typeFilter);
-    const query = params.toString() ? `?${params}` : "";
+    const query = params.toString();
 
-    fetch(`${API}/cars${query}`, { credentials: "include" })
-      .then((res) => res.json())
-      .then((data) => {
-        setCars(Array.isArray(data) ? data : []);
-        setLoading(false);
+    fetchCarsApi(query)
+      .then(setCars)
+      .catch((err) => {
+        console.error(err.message);
+        setCars([]);
       })
-      .catch(() => setLoading(false));
+      .finally(() => setLoading(false));
   }, [search, typeFilter]);
 
   useEffect(() => {
-    const timer = setTimeout(fetchCars, 300);
+    const timer = setTimeout(loadCars, 300);
     return () => clearTimeout(timer);
-  }, [fetchCars]);
+  }, [loadCars]);
 
   return (
     <div className="min-h-screen py-24">

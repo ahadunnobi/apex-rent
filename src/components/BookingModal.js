@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaCar } from "react-icons/fa";
+import { getCarName, getCarPrice } from "@/lib/car-utils";
 
 export default function BookingModal({ open, car, onClose, onBook, loading }) {
   const [driverNeeded, setDriverNeeded] = useState("No");
@@ -13,9 +14,11 @@ export default function BookingModal({ open, car, onClose, onBook, loading }) {
     onBook({ driverNeeded, specialNote });
   };
 
+  if (!car) return null;
+
   return (
     <AnimatePresence>
-      {open && car && (
+      {open && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -35,10 +38,10 @@ export default function BookingModal({ open, car, onClose, onBook, loading }) {
                 <FaCar className="text-primary text-xl" />
                 <div>
                   <h3 className="text-lg font-display font-bold">Book Vehicle</h3>
-                  <p className="text-sm text-base-content/60">{car.name}</p>
+                  <p className="text-sm text-base-content/60">{getCarName(car)}</p>
                 </div>
               </div>
-              <button onClick={onClose} className="btn btn-ghost btn-circle btn-sm">
+              <button type="button" onClick={onClose} className="btn btn-ghost btn-circle btn-sm">
                 <FaTimes />
               </button>
             </div>
@@ -46,7 +49,9 @@ export default function BookingModal({ open, car, onClose, onBook, loading }) {
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="flex items-center justify-between p-4 rounded-xl bg-base-200/50 border border-primary/10">
                 <span className="text-sm text-base-content/70">Daily Rate</span>
-                <span className="text-xl font-bold text-primary font-display">${car.price}/day</span>
+                <span className="text-xl font-bold text-primary font-display">
+                  ${getCarPrice(car)}/day
+                </span>
               </div>
 
               <div className="form-control">

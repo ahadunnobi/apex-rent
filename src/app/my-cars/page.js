@@ -106,9 +106,13 @@ function MyCarsContent() {
                     <h2 className="font-display font-black text-lg">{car.car_name || car.name}</h2>
                     <p className="text-xs text-base-content/60 flex items-center gap-1 mb-4">
                       <FaMapMarkerAlt className="text-primary" />
-                      {car.pickupLocation || car.location || "N/A"}
+                      {car.pickup_location || car.pickupLocation || car.location || "N/A"}
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
+                      <Link href={`/cars/${car._id}`} className="btn btn-sm btn-ghost w-full text-primary">
+                        View Details
+                      </Link>
+                      <div className="flex gap-2">
                       <Link href={`/edit-car/${car._id}`} className="btn btn-outline btn-sm btn-primary flex-1 gap-1">
                         <FaEdit className="text-xs" /> Update
                       </Link>
@@ -118,6 +122,7 @@ function MyCarsContent() {
                       >
                         <FaTrash className="text-xs" /> Delete
                       </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

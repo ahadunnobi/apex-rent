@@ -1,6 +1,6 @@
 "use server";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API = (process.env.SERVER_URL || "http://localhost:5000").replace(/\/$/, "");
 
 // Fetch all cars
 export async function fetchCars() {

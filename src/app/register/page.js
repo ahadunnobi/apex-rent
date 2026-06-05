@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { getGoogleAuthUrl } from "@/lib/api";
+import { authClient } from "@/lib/auth-client";
 
 function validatePassword(password) {
   if (password.length < 6) return "Password must be at least 6 characters.";
@@ -77,7 +77,7 @@ export default function RegisterPage() {
               Join Apex Rent
             </span>
             <h2 className="text-3xl font-black font-display text-base-content">
-              Create <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Account</span>
+              User <span className="text-transparent bg-gradient-to-r from-primary to-secondary bg-clip-text">Registration</span>
             </h2>
           </div>
 
@@ -160,12 +160,19 @@ export default function RegisterPage() {
 
           <div className="divider text-xs text-base-content/40 my-6">OR</div>
 
-          <a
-            href={getGoogleAuthUrl()}
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await authClient.signIn.social({ provider: "google", callbackURL: "/" });
+              } catch {
+                toast.error("Google login failed");
+              }
+            }}
             className="btn btn-outline w-full rounded-xl gap-2 border-primary/30"
           >
             <FcGoogle className="text-xl" /> Continue with Google
-          </a>
+          </button>
 
           <p className="text-center text-sm text-base-content/60 mt-8">
             Already have an account?{" "}

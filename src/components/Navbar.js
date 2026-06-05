@@ -6,8 +6,19 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import ProtectedNavLink from "@/components/ProtectedNavLink";
 import { FiSun, FiMoon } from "react-icons/fi";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+
+const publicLinks = [
+  { href: "/", label: "Home" },
+  { href: "/cars", label: "Explore Cars" },
+];
+
+const privateLinks = [
+  { href: "/add-car", label: "Add Car" },
+  { href: "/my-bookings", label: "My Bookings" },
+];
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -15,7 +26,6 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [theme, setTheme] = useState("apex");
 
-  // Load and apply theme on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem("apex_theme") || "apex";
     setTheme(savedTheme);
@@ -29,12 +39,21 @@ export default function Navbar() {
     localStorage.setItem("apex_theme", newTheme);
   };
 
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/cars", label: "Explore Cars" },
-    { href: "/add-car", label: "Add Car" },
-    { href: "/my-bookings", label: "My Bookings" },
-  ];
+  const closeMobile = () => setMobileOpen(false);
+
+  const linkClass = (href) =>
+    `px-4 py-2 rounded-lg text-sm transition-all duration-200 relative ${
+      pathname === href
+        ? "text-primary bg-primary/10 font-bold"
+        : "text-base-content/70 hover:text-primary hover:bg-base-200"
+    }`;
+
+  const mobileLinkClass = (href) =>
+    `block px-4 py-3 rounded-lg text-base transition-all ${
+      pathname === href
+        ? "bg-primary/10 text-primary font-bold border-l-4 border-primary"
+        : "text-base-content/70 hover:bg-base-200 hover:text-primary"
+    }`;
 
   return (
     <motion.nav
@@ -43,9 +62,7 @@ export default function Navbar() {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="navbar bg-base-100/80 backdrop-blur-md sticky top-0 z-50 px-4 md:px-8 border-b border-primary/10 shadow-lg"
     >
-      {/* ── Left Side: Logo & Brand ── */}
       <div className="navbar-start">
-        {/* Mobile Hamburger toggle */}
         <button
           className="btn btn-ghost btn-circle lg:hidden text-primary mr-2"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -55,7 +72,7 @@ export default function Navbar() {
         </button>
 
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="avatar ring ring-primary/30 ring-offset-base-100 ring-offset-2 rounded-full overflow-hidden transition-all duration-300 group-hover:ring-primary/80">
+          <div className="avatar ring ring-primary/30 ring-offset-base-100 ring-offset-2 rounded-full overflow-hidden">
             <div className="w-9 h-9 relative">
               <Image
                 src="/logo.png"
@@ -73,47 +90,36 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* ── Center: Navigation Links ── */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal p-0 gap-2 font-medium">
-          {navLinks.map((link) => (
+          {publicLinks.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm transition-all duration-200 relative
-                  ${
-                    pathname === link.href
-                      ? "text-primary bg-primary/10 font-bold"
-                      : "text-base-content/70 hover:text-primary hover:bg-base-200"
-                  }`}
-              >
+              <Link href={link.href} className={linkClass(link.href)}>
                 {link.label}
-                {pathname === link.href && (
-                  <motion.span
-                    layoutId="active-indicator"
-                    className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary rounded-full"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
               </Link>
+            </li>
+          ))}
+          {privateLinks.map((link) => (
+            <li key={link.href}>
+              <ProtectedNavLink href={link.href} className={linkClass(link.href)}>
+                {link.label}
+              </ProtectedNavLink>
             </li>
           ))}
         </ul>
       </div>
 
-      {/* ── Right Side: Conditional User Profile & Theme Toggle ── */}
-      <div className="navbar-end gap-3">
-        {/* User Auth (conditional, safe-guarded by mounted state to prevent hydration mismatches) */}
+      <div className="navbar-end gap-2">
         {mounted && (
           <>
             {user ? (
               <div className="dropdown dropdown-end">
                 <label
                   tabIndex={0}
-                  className="btn btn-ghost btn-circle avatar border border-primary/20 hover:border-primary/60 transition-all duration-300"
+                  className="btn btn-ghost btn-circle avatar border border-primary/20 hover:border-primary/60"
                 >
                   <div className="w-9 rounded-full">
-                    <img src={user.avatar} alt="Profile" />
+                    <img src={user.avatar} alt={user.name} referrerPolicy="no-referrer" />
                   </div>
                 </label>
                 <ul
@@ -146,7 +152,7 @@ export default function Navbar() {
                   <li>
                     <button
                       onClick={logout}
-                      className="py-2.5 text-error hover:bg-error/10 hover:text-error-content transition-all"
+                      className="py-2.5 text-error hover:bg-error/10 w-full text-left"
                     >
                       Logout
                     </button>
@@ -154,57 +160,74 @@ export default function Navbar() {
                 </ul>
               </div>
             ) : (
-              <Link
-                href="/login"
-                className="btn btn-primary btn-sm rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all font-bold px-5"
-              >
-                Login
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="btn btn-ghost btn-sm rounded-lg font-bold px-4"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="btn btn-primary btn-sm rounded-lg font-bold px-4"
+                >
+                  Register
+                </Link>
+              </div>
             )}
           </>
         )}
 
-        {/* Color Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="btn btn-ghost btn-circle text-primary hover:bg-base-200 transition-colors"
+          className="btn btn-ghost btn-circle text-primary"
           aria-label="Toggle theme"
         >
-          {theme === "apex" ? (
-            <FiSun className="text-xl animate-spin-slow" />
-          ) : (
-            <FiMoon className="text-xl" />
-          )}
+          {theme === "apex" ? <FiSun className="text-xl" /> : <FiMoon className="text-xl" />}
         </button>
       </div>
 
-      {/* ── Mobile Expandable Menu ── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="lg:hidden absolute top-[73px] left-0 right-0 bg-base-100 border-b border-primary/10 overflow-hidden shadow-2xl"
+            className="lg:hidden absolute top-[73px] left-0 right-0 bg-base-100 border-b border-primary/10 shadow-2xl"
           >
             <ul className="menu p-4 gap-2 font-medium">
-              {navLinks.map((link) => (
+              {publicLinks.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`block px-4 py-3 rounded-lg text-base transition-all
-                      ${
-                        pathname === link.href
-                          ? "bg-primary/10 text-primary font-bold border-l-4 border-primary"
-                          : "text-base-content/70 hover:bg-base-200 hover:text-primary"
-                      }`}
-                  >
+                  <Link href={link.href} onClick={closeMobile} className={mobileLinkClass(link.href)}>
                     {link.label}
                   </Link>
                 </li>
               ))}
+              {privateLinks.map((link) => (
+                <li key={link.href}>
+                  <ProtectedNavLink
+                    href={link.href}
+                    onNavigate={closeMobile}
+                    className={mobileLinkClass(link.href)}
+                  >
+                    {link.label}
+                  </ProtectedNavLink>
+                </li>
+              ))}
+              {mounted && !user && (
+                <>
+                  <li>
+                    <Link href="/login" onClick={closeMobile} className={mobileLinkClass("/login")}>
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/register" onClick={closeMobile} className={mobileLinkClass("/register")}>
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </motion.div>
         )}

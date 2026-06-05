@@ -11,9 +11,18 @@ import {
 } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { apiFetch, API } from "@/lib/api";
+import { apiFetch } from "@/lib/api";
+import { fetchCarById } from "@/lib/fetchCars";
 import BookingModal from "@/components/BookingModal";
 import ConfirmModal from "@/components/ConfirmModal";
+import {
+  getCarName,
+  getCarPrice,
+  getCarImage,
+  getCarType,
+  getPickupLocation,
+  isCarAvailable,
+} from "@/lib/car-utils";
 
 export default function CarDetailPage() {
   const params = useParams();
@@ -33,9 +42,7 @@ export default function CarDetailPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API}/cars/${params.id}`, { cache: "no-store" });
-      const data = await res.json();
-      if (!res.ok || !data?._id) throw new Error("Car not found");
+      const data = await fetchCarById(params.id);
       setCar(data);
     } catch (err) {
       setError(err.message || "Failed to load car");
@@ -119,34 +126,37 @@ export default function CarDetailPage() {
 
   return (
     <div className="min-h-screen py-24">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-8">
           <Link href="/cars" className="inline-flex items-center gap-2 text-base-content/60 hover:text-primary text-sm">
             <FaArrowLeft /> Back to All Cars
           </Link>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden">
-          <div className="relative h-[400px] w-full overflow-hidden">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden flex flex-col lg:flex-row">
+          
+          {/* Left Side: Car Image */}
+          <div className="relative h-[400px] lg:h-auto lg:w-1/2 w-full shrink-0 overflow-hidden">
             <img
               src={car.image_url || car.image || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?w=1200"}
               alt={car.car_name || car.name}
-              className="object-cover w-full h-full"
+              className="absolute inset-0 object-cover w-full h-full"
             />
-            <div className="absolute top-6 right-6 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-5 py-2 rounded-xl text-lg font-bold">
+            <div className="absolute top-6 right-6 bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-5 py-2 rounded-xl text-lg font-bold shadow-lg shadow-cyan-500/20">
               ${car.daily_rent_price || car.price}/day
             </div>
-            <div className={`absolute top-6 left-6 px-4 py-1.5 rounded-full text-xs font-bold uppercase
-              ${car.availability_status !== false && car.availability !== "Unavailable" ? "bg-green-500/20 text-green-300 border border-green-400/30" : "bg-red-500/20 text-red-300 border border-red-400/30"}`}>
-              {(car.availability_status !== false && car.availability !== "Unavailable") ? "Available" : "Unavailable"}
+            <div className={`absolute top-6 left-6 px-4 py-1.5 rounded-full text-xs font-bold uppercase shadow-lg
+              ${isCarAvailable(car) ? "bg-green-500/90 text-white border border-green-400" : "bg-red-500/90 text-white border border-red-400"}`}>
+              {isCarAvailable(car) ? "Available" : "Unavailable"}
             </div>
           </div>
 
-          <div className="p-8">
-            <h1 className="text-3xl md:text-4xl font-black font-display mb-2">{car.car_name || car.name}</h1>
-            {car.booking_count > 0 && (
-              <p className="text-sm text-primary mb-6">{car.booking_count} bookings so far</p>
-            )}
+          {/* Right Side: Details & Actions */}
+          <div className="p-8 lg:p-12 lg:w-1/2 flex flex-col justify-center">
+            <h1 className="text-3xl md:text-4xl font-black font-display mb-2">{getCarName(car)}</h1>
+            <p className="text-sm text-primary mb-6">
+              Booked by {car.booking_count || 0} person{(car.booking_count || 0) === 1 ? "" : "s"}
+            </p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {[
@@ -168,7 +178,7 @@ export default function CarDetailPage() {
               <p className="text-base-content/70 leading-relaxed">{car.description || "No description available."}</p>
             </div>
 
-            {(car.availability_status !== false && car.availability !== "Unavailable") && (
+            {isCarAvailable(car) && (
               <div className="mb-8">
                 {user ? (
                   <button
@@ -180,7 +190,12 @@ export default function CarDetailPage() {
                 ) : (
                   <div className="text-center p-6 border border-primary/20 rounded-xl bg-base-200/30">
                     <p className="text-base-content/60 mb-4 text-sm">Please log in to book this vehicle.</p>
-                    <Link href="/login" className="btn btn-primary btn-sm rounded-lg font-bold">Log In</Link>
+                    <Link
+                      href={`/login?redirect=${encodeURIComponent(`/cars/${params.id}`)}`}
+                      className="btn btn-primary btn-sm rounded-lg font-bold"
+                    >
+                      Log In
+                    </Link>
                   </div>
                 )}
               </div>
@@ -214,7 +229,7 @@ export default function CarDetailPage() {
       <ConfirmModal
         open={deleteOpen}
         title="Delete Car"
-        message={`Are you sure you want to delete "${car.name}"? This cannot be undone.`}
+        message={`Are you sure you want to delete "${getCarName(car)}"? This cannot be undone.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteOpen(false)}
         loading={deleting}
